@@ -1,28 +1,34 @@
 def process_move(position, move):
+    
+    # Get direction and movement amount
     direction = move[0]
     val = int(move[1:])
 
-    p1 = position
-
+    # set move increment based on direction
     if direction == 'R':
-        times_passed_zero = int((val + position)/100)
-        position += val
-    elif direction == 'L':
-        if val >= position and position > 0:
-            
-            if val < 100:
-                times_passed_zero = 1
-            else:
-                times_passed_zero = int((val - position)/100)
-        else:
-            times_passed_zero = 0
-        position -= val
+        move = 1
     else:
-        raise SyntaxError(f'Unknown instruction {direction}')
-
-    return position % 100, times_passed_zero
+        move = -1
 
 
+    # count the # of times it passes 0
+    zero_counter = 0
+
+    # process individual moves
+    for i in range(1, val+1):
+        position += move # Move position by one
+
+        # if move puts position at -1 or 100, adjust accordingly
+        if position == 100:
+            position = 0
+        elif position == -1:
+            position = 99
+
+        # count zeros (part 2)
+        if position == 0:
+            zero_counter += 1
+
+    return position, zero_counter 
 
 if __name__ == '__main__':
     with open('input.txt') as inf:
@@ -35,11 +41,11 @@ if __name__ == '__main__':
     print('Init:', dial_position)
 
     for move in data:
-        dial_position, times_passed_zero = process_move(dial_position, move)
-        print(move, dial_position, times_passed_zero)
+        dial_position, zeros = process_move(dial_position, move)
         
         #part1
         password_p1 += 1 if dial_position == 0 else 0
-        password_p2 += times_passed_zero
+        password_p2 += zeros
+
     print('Part 1:', password_p1)
     print('Part 2:', password_p2)
